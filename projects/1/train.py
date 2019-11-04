@@ -39,14 +39,15 @@ logging.info(f"TRAIN_PATH {train_path}")
 # Read dataset
 #
 
-read_table_opts = dict(sep=",", names=fields, index_col=False)
+#read_table_opts = dict(sep=",", names=fields, index_col=False)
+read_table_opts = dict(sep="\s", names=fields, index_col=False)
 df = pd.read_table(train_path, **read_table_opts)
 
 #split train/test
 X_train, X_test, y_train, y_test = train_test_split(
-    df.iloc[:,:-1], df.iloc[:,-1], test_size=0.33, random_state=42
+    df.iloc[:,2:], df.iloc[:,1], test_size=0.33, random_state=42
 )
-
+#df.iloc[:,:-1], df.iloc[:,-1], test_size=0.33, random_state=42
 #
 # Train the model
 #
