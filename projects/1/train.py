@@ -46,7 +46,7 @@ df = pd.read_table(train_path, **read_table_opts)
 fields_selected = ["id", "if1", "if2", "if3", "if4", "cf1", "cf2", "cf3", "cf4"]
 #split train/test
 X_train, X_test, y_train, y_test = train_test_split(
-    df.iloc[:, fields_selected], df.iloc[:,1], test_size=0.33, random_state=42
+    df.iloc[:, (df.columns == fields_selected)], df.iloc[:,1], test_size=0.33, random_state=42
 )
 #df.iloc[:,:-1], df.iloc[:,-1], test_size=0.33, random_state=42
 #
