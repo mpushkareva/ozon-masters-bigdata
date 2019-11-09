@@ -8,13 +8,10 @@ from sklearn.model_selection import train_test_split, GridSearchCV
 #
 # Dataset fields
 #
-#numeric_features = ["if"+str(i) for i in range(1,14)]
-#categorical_features = ["cf"+str(i) for i in range(1,27)] + ["day_number"]
+numeric_features = ["if"+str(i) for i in range(1,14)]
+categorical_features = ["cf"+str(i) for i in range(1,27)] + ["day_number"]
 
-#fields = ["id", "label"] + numeric_features + categorical_features
-numeric_features = ["id", "if1", "if2", "if3"]
-categorical_features = ["cf1", "cf2", "cf3", "cf4"]
-fields_selected = ["id", "if1", "if2", "if3", "if4", "cf1", "cf2", "cf3", "cf4"]
+fields = ["id", "label"] + numeric_features + categorical_features
 #
 # Model pipeline
 #
