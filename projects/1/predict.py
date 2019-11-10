@@ -27,8 +27,10 @@ read_opts=dict(
         sep=',', names=fields, index_col=False, header=None,
         iterator=True, chunksize=200
 )
-
+fields_selected = ["id"] + ["if"+str(i) for i in range(1,14)] \
+                + ["cf1", "cf2", "cf3", "cf4"]
 for df in pd.read_csv(sys.stdin, **read_opts):
-    pred = model.predict(df)
-    out = zip(df.doc_id, pred)
+    df_selected = df.loc[:, fields_selected]
+    pred = model.predict(df_selected)
+    out = zip(df_selected.doc_id, pred)
     print("\n".join(["{0},{1}".format(*i) for i in out]))
