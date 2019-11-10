@@ -6,7 +6,7 @@ from glob import glob
 import logging
 
 sys.path.append('.')
-from model import fields
+#from model import fields
 
 #
 # Init the logger
@@ -33,7 +33,9 @@ exec(open(filter_cond_files[0]).read())
 # If +field option is given, output the id (always first record) and the given field
 # if -field is given, output all but the given field
 #
-
+numeric_features = ["if"+str(i) for i in range(1,14)]
+categorical_features = ["cf"+str(i) for i in range(1,27)] + ["day_number"]
+fields = ["id"] + numeric_features + categorical_features
 if len(sys.argv) == 1:
   #by default print all fields
   outfields = fields
