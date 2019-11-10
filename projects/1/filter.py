@@ -61,11 +61,11 @@ for line in sys.stdin:
         continue
 
     #unpack into a tuple/dict
-    values = line.rstrip().split(',')
+    values = line.rstrip().split('\t')
     banner = dict(zip(fields, values)) #banner(values)
 
     #apply filter conditions
     if filter_cond(banner):
-        output = ",".join([banner[x] for x in outfields])
+        output = "\t".join([banner[x] for x in outfields])
         print(output)
 
