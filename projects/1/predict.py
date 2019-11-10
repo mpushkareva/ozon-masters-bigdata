@@ -37,4 +37,4 @@ for df in pd.read_csv(sys.stdin, **read_opts):
     df_selected = df.loc[:, fields_selected]
     pred = model.predict(df_selected)
     out = zip(df_selected.doc_id, pred)
-    print("\n".join(["{0},{1}".format(*i) for i in out]))
+    print("\n".join(["{0}\t{1}".format(*i) for i in out]))
