@@ -29,10 +29,10 @@ categorical_features = ["cf"+str(i) for i in range(1,27)] + ["day_number"]
 fields_without_label = ["id"] + numeric_features + categorical_features
 read_opts=dict(
         sep='\s', names=fields_without_label, index_col=False, header=None,
-        iterator=True, chunksize=200
+        iterator=True, chunksize=1000
 )
 fields_selected = ["id"] + ["if"+str(i) for i in range(1,14)] \
-                + ["cf1", "cf2", "cf3", "cf4"]
+                + ["cf2", "cf3", "cf4"]
 for df in pd.read_csv(sys.stdin, **read_opts):
     df_selected = df.loc[:, fields_selected]
     pred = model.predict(df_selected)
