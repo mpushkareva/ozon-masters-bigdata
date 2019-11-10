@@ -28,7 +28,7 @@ categorical_features = ["cf"+str(i) for i in range(1,27)] + ["day_number"]
 
 fields_without_label = ["id"] + numeric_features + categorical_features
 read_opts=dict(
-        sep=',', names=fields_without_label, index_col=False, header=None,
+        sep='\s', names=fields_without_label, index_col=False, header=None,
         iterator=True, chunksize=200
 )
 fields_selected = ["id"] + ["if"+str(i) for i in range(1,14)] \
