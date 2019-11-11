@@ -54,8 +54,8 @@ X_train, X_test, y_train, y_test = train_test_split(
 # Train the model
 #
 model.fit(X_train, y_train)
-
-model_score = model.score(X_test, y_test)
+predictions = model.predict(X_test)
+model_score = log_loss(y_test, predictions)
 
 logging.info(f"model score: {model_score:.3f}")
 
