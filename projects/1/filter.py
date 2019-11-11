@@ -42,7 +42,7 @@ if len(sys.argv) == 1:
 else:
   op, field = sys.argv[1][0], sys.argv[1][1:]
   logging.info(f"OP {op}")
-  logging.info(f"FIELD {field}")
+  logging.info(f"FIELD {fields}")
 
   if not op in "+-" or not field in fields:
     logging.critical("The optional argument must start with + or - followed by a valid field")
