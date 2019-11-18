@@ -32,8 +32,15 @@ read_opts=dict(
 )
 fields_selected = ["id"] + ["if"+str(i) for i in range(1,14)] \
                 + ["cf2", "cf3", "cf4"]
-for df in pd.read_sql(sys.stdin, **read_opts):
-    df_selected = df.loc[:, fields_selected]
-    pred = model.predict(df_selected)
-    out = zip(df_selected.id, pred)
-    print("\n".join(["{0}\t{1}".format(*i) for i in out]))
+
+for line in sys.stdin:
+        id, if1, if2, if3, if4, if5,\
+        if6, if7, if8, if9, if10, if11, if12,\
+        if13, if14, cf2, cf3, cf4 = line.strip('\n').split('\s')
+        df = pd.DataFrame([id, if1, if2, if3, if4, if5,
+        if6, if7, if8, if9, if10, if11, if12,
+        if13, if14, cf2, cf3, cf4])
+        pred = model.predict(df)
+        out = zip(df[0], pred)
+        print'\t'.join(map(str, [fname, age]))
+        print("\n".join(["{0}\t{1}".format(*i) for i in out]))
