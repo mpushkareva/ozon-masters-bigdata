@@ -36,7 +36,7 @@ fields_selected = ["id"] + ["if"+str(i) for i in range(1,14)] \
 for line in sys.stdin:
         id, if1, if2, if3, if4, if5,\
         if6, if7, if8, if9, if10, if11, if12,\
-        if13, if14, cf2, cf3, cf4 = line.strip('\n').split('\s')
+        if13, if14, cf2, cf3, cf4 = line.strip('\n').split('\t')
         if if1 = '\\N': if1 = '0'
         if if2 = '\\N': if2 = '0'
         if if3 = '\\N': if3 = '0'
@@ -54,9 +54,9 @@ for line in sys.stdin:
         if cf2 = '\\N': cf2 =''
         if cf3 = '\\N': cf3 =''
         if cf4 = '\\N': cf4 =''
-        df = pd.DataFrame([id, if1, if2, if3, if4, if5,
+        df = pd.DataFrame([int(id), if1, if2, if3, if4, if5,
         if6, if7, if8, if9, if10, if11, if12,
         if13, if14, cf2, cf3, cf4])
         pred = model.predict(df)
         out = zip(df[0], pred)
-        print("{0}\s{1}".format(*i) for i in out))
+        print("{0}\t{1}".format(*i) for i in out))
