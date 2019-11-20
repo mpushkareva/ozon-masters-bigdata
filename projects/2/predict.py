@@ -38,5 +38,5 @@ for line in sys.stdin:
         df.iloc[0:15].replace('\\N', '0')
         df.iloc[15:18].replace('\\N', '')
         pred = model.predict(df)
-        out = zip(df[0], pred)
+        out = zip(df[0][0], pred)
         print("{0}\t{1}".format(*i) for i in out))
