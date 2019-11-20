@@ -41,7 +41,7 @@ logging.info(f"TRAIN_PATH {train_path}")
 #
 
 #read_table_opts = dict(sep=",", names=fields, index_col=False)
-read_table_opts = dict(sep="\s", names=fields, index_col=False)
+read_table_opts = dict(sep="\t", names=fields, index_col=False)
 df = pd.read_table(train_path, **read_table_opts)
 
 fields_selected = ["id"] + ["if"+str(i) for i in range(1,14)] \
