@@ -33,7 +33,7 @@ read_opts=dict(
 fields_selected = ["id"] + ["if"+str(i) for i in range(1,14)] \
                 + ["cf2", "cf3", "cf4"]
 for df in pd.read_csv(sys.stdin, **read_opts):
-    df.iloc[:, 0:15].replace('\\N', '0')
+    df.iloc[:, 0:15] = df.iloc[:, 0:15].replace('\\N', '0')
     df.iloc[:, 0:15] = df.iloc[:, 0:15].astype(int)
     pred = model.predict(df)
     out = zip(df.id, pred)
