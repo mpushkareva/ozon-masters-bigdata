@@ -35,8 +35,8 @@ fields_selected = ["id"] + ["if"+str(i) for i in range(1,14)] \
 
 for line in sys.stdin:
         df = pd.DataFrame(line.strip('\n').split('\t'))
-        df.iloc[0:15].replace('\\N', '0')
-        df.iloc[15:18].replace('\\N', '')
+        df.iloc[:,0:15].replace('\\N', '0')
+        df.iloc[:,0:15] = df.iloc[:,0:15].astype(int)
         pred = model.predict(df)
         out = zip(df[0][0], pred)
-        print("{0}\t{1}".format(*i) for i in out))
+        print("\n".join(["{0}\t{1}".format(*i) for i in out]))
