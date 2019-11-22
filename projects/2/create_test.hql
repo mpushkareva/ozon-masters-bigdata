@@ -6,7 +6,7 @@ create external table hw2_test(
                  if7 int, if8 int,
                  if9 int, if10 int,
                  if11 int, if12 int,
-                 if13 int
+                 if13 int,
                  cf1 string, cf2 string, 
                  cf3 string, cf4 string,  
                  cf5 string, cf6 string, 
