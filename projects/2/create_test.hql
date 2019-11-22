@@ -19,8 +19,7 @@ create external table hw2_test(
                  cf19 string, cf20 string, 
                  cf21 string, cf22 string, 
                  cf23 string, cf24 string, 
-                 cf25 string, cf26 string, 
-                 cf27 string, 
-                 day_number int) 
+                 cf25 string, cf26 string,  
+                 day_number string) 
  row format delimited fields terminated by '\t' lines terminated by '\n'
  stored as textfile location '/datasets/criteo_test_large_features';
