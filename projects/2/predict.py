@@ -28,13 +28,14 @@ fields_without_label = ["id"] + numeric_features + categorical_features
 fields_selected = ["id"] + ["if"+str(i) for i in range(1,14)] \
                 + ["cf2", "cf3", "cf4"]
 read_opts=dict(
-        sep='\t', names=fields_selected, index_col=False, header=None,
+        sep='\t', names=fields_without_label, index_col=False, header=None,
         iterator=True, chunksize=1000
 )
 
 for df in pd.read_csv(sys.stdin, **read_opts):
-    df.iloc[:, 0:14] = df.iloc[:, 0:14].replace('\\N', '0')
-    df.iloc[:, 0:14] = df.iloc[:, 0:14].astype(int)
-    pred = model.predict(df)
-    out = zip(df.id, pred)
+    df_selected = df.loc[fields_selected]
+    df_selected.iloc[:, 0:14] = df_selected.iloc[:, 0:14].replace('\\N', '0')
+    df_selected.iloc[:, 0:14] = df_selected.iloc[:, 0:14].astype(int)
+    pred = model.predict(df_selected)
+    out = zip(df_selected.id, pred)
     print("\n".join(["{0}\t{1}".format(*i) for i in out]))
