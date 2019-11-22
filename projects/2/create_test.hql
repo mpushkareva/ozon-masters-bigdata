@@ -1,5 +1,5 @@
 create external table hw2_test(
-                 id int, label int,
+                 id int, 
                  if1 int, if2 int,
                  if3 int, if4 int,
                  if5 int, if6 int,
