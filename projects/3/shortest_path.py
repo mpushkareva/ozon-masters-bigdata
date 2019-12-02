@@ -34,7 +34,7 @@ def shortest_path(v_from, v_to, df_name, output, max_path_length=10):
     StructField("user_id", StringType()),
     StructField("follower_id", StringType())])
     
-    data = spark.read.schema(schema).format("csv").option("sep", "\t").load(df_name)
+    df = spark.read.schema(schema).format("csv").option("sep", "\t").load(df_name)
     
     df_sel = df.where(df.follower_id == v_from)
     df_paths = df_sel.select(f.concat_ws(",",  "follower_id", "user_id").alias("path"), df_sel.user_id.alias("next"))
