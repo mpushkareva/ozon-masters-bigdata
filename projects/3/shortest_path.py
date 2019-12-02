@@ -42,7 +42,9 @@ def shortest_path(v_from, v_to, df_name, output, max_path_length=10):
         if df_paths.where(df_paths.next == v_to).count() == 0:
             df_ext = df_paths.join(df.select(df.follower_id.alias("next"), df.user_id), on="next", how="inner")
             df_paths = df_ext.select(f.concat_ws(",", "path",  "user_id").alias("path"), df_ext.user_id.alias("next"))
-        else: df_paths.select("path").where(df_paths.next == v_to).write.mode("overwrite").text(output)
+        else: 
+            df_paths.select("path").where(df_paths.next == v_to).write.mode("overwrite").text(output)
+            break
     spark.stop()
 
 shortest_path(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
