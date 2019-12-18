@@ -13,7 +13,7 @@ swr = StopWordsRemover(inputCol=tokenizer.getOutputCol(), outputCol="reviewFilte
 count_vectorizer = CountVectorizer(inputCol=swr.getOutputCol(), outputCol="reviewVector", binary=True, vocabSize=2500)
 assembler = VectorAssembler(inputCols=[count_vectorizer.getOutputCol(), 'verified'], outputCol="features")
 
-lr = LogisticRegression(featuresCol="reviewVector", labelCol="overall", maxIter=5, regParam=0)
+lr = LogisticRegression(featuresCol="reviewVector", labelCol="overall", maxIter=10, regParam=0)
 
 evaluator = RegressionEvaluator(labelCol="overall", predictionCol="prediction", metricName='rmse')
 
