@@ -23,14 +23,37 @@ conf = SparkConf()
 from pyspark.sql.types import *
 from pyspark.ml.feature import *
 import pyspark.sql.functions as f
-from pyspark.ml.classification import LogisticRegression
 from pyspark.ml import Pipeline
-from pyspark.ml.evaluation import RegressionEvaluator
-from model import pipeline
+from model import pipeline, sklearn_est
+import joblib import dump
+from sklearn.linear_model import LogisticRegression
+import pickle
 
 path = sys.argv[1]
 train =  spark.read.json(path)
-#train, test = data.randomSplit([0.9, 0.1], seed=12345)
 pipeline_model = pipeline.fit(train)
 
-pipeline_model.write().overwrite().save(sys.argv[2])
+pipeline_model = pipeline.fit(train)
+train_transformed = pipeline_model.transform(train)
+
+est = LogisticRegression(random_state=5757)
+est_broadcast = spark.sparkContext.broadcast(est)
+
+@F.udf(ArrayType(FloatType()))
+def vectorToArray(row):
+    return row.tolist()
+
+@F.pandas_udf(FloatType())
+def predict(series):
+    predictions = est_broadcast.value.predict(series)
+    return pd.Series(predictions)
+
+with open("logistic_model.pk", "wb") as f:
+    pickle.dump(est, f)
+    
+spark_est = SKLogisticRegreesionModel(model_file="logistic_model.pk", featuresCol="features",\
+                                      vectorToArray=vectorToArray, predict=predict)
+##spark_est.transform(df_test)
+
+
+dump(spark_est, "{}.joblib.format(5))
