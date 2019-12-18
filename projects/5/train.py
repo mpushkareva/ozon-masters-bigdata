@@ -28,6 +28,7 @@ from model import pipeline, sklearn_est
 import joblib import dump
 from sklearn.linear_model import LogisticRegression
 import pickle
+from pyspark.ml import PipelineModel
 
 path = sys.argv[1]
 train =  spark.read.json(path)
@@ -36,24 +37,17 @@ pipeline_model = pipeline.fit(train)
 pipeline_model = pipeline.fit(train)
 train_transformed = pipeline_model.transform(train)
 
-est = LogisticRegression(random_state=5757)
-est_broadcast = spark.sparkContext.broadcast(est)
+pipeline_model.write().overwrite().save(sys.argv[2])
 
-@F.udf(ArrayType(FloatType()))
-def vectorToArray(row):
-    return row.tolist()
+est = LogisticRegression(random_state=5757).fit(train_transformed)
+#est_broadcast = spark.sparkContext.broadcast(est)
 
-@F.pandas_udf(FloatType())
-def predict(series):
-    predictions = est_broadcast.value.predict(series)
-    return pd.Series(predictions)
 
 with open("logistic_model.pk", "wb") as f:
     pickle.dump(est, f)
     
-spark_est = SKLogisticRegreesionModel(model_file="logistic_model.pk", featuresCol="features",\
-                                      vectorToArray=vectorToArray, predict=predict)
+spark_est = SKLogisticRegreesionModel(model_file="logistic_model.pk", featuresCol="features", labelCol="label")
 ##spark_est.transform(df_test)
 
 
-dump(spark_est, "{}.joblib.format(5))
+dump(spark_est, "{}.joblib".format(sys.argv[3]))

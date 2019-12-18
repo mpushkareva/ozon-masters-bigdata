@@ -21,10 +21,19 @@ spark.sparkContext.setLogLevel('WARN')
 conf = SparkConf()
 
 from pyspark.ml import Pipeline, PipelineModel
+from sklearn_wrapper import SklearnEstimatorModel
 
 model = PipelineModel.load(sys.argv[1])
-path = sys.argv[2]
-test =  spark.read.json(path)
-predictions = model.transform(test)
+test_path = sys.argv[3]
+test =  spark.read.json(test_path)
+test_transformed = model.transform(test)
+spark_est = SklearnEstimatorModel(model_path=arg[2])
 
-predictions.select("id","prediction").write.parquet(sys.argv[3], mode="overwrite")
+predictions = spark_est.transform(test_transformed)
+
+predictions.select("id","prediction").write.parquet(sys.argv[4], mode="overwrite")
+
+
+
+
+

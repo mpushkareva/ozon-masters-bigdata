@@ -16,10 +16,20 @@ class SklearnEstimatorModel(Model, HasFeaturesCol, HasLabelCol, HasPredictionCol
         if model_file is None:
             raise ValueError("model_file must be specified!")
         with open(model_file, "rb") as f:
-            self.estimator = load.load(model_file)
+            self.estimator = load(model_file)
         kwargs = self._input_kwargs
         self._set(**kwargs)
+    
+    @F.udf(ArrayType(FloatType()))
+    def vectorToArray(row):
+        return row.tolist()
+
+    @F.pandas_udf(FloatType())
+    def predict(series, est):
+        est_broadcast = spark.sparkContext.broadcast(est)
+        predictions = est_broadcast.value.predict(series)
+        return pd.Series(predictions)
         
     def _transform(self, dataset):
         dataset = dataset.withColumn("features_array", vectorToArray(self.getFeaturesCol())).localCheckpoint()
-        return dataset.withColumn(self.getPredictionCol(), predict("features_array"))
+        return dataset.withColumn(self.getPredictionCol(), predict("features_array", self.estimator))
