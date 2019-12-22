@@ -29,19 +29,14 @@ from pyspark import keyword_only
 from pyspark.ml import Model
 from pyspark.ml.param import Param, Params, TypeConverters
 from pyspark.ml.param.shared import HasFeaturesCol, HasLabelCol, HasPredictionCol
-from joblib import load
-from pyspark.ml import Pipeline, PipelineModel
-from sklearn_wrapper import SklearnEstimatorModel
+from pyspark.ml import Pipelin
 
 model = PipelineModel.load(sys.argv[1])
-test_path = sys.argv[3]
+test_path = sys.argv[2]
 test =  spark.read.json(test_path)
-test_transformed = model.transform(test)
-spark_est = SklearnEstimatorModel(model_file=arg[2])
-est_broadcast = spark.sparkContext.broadcast(spark_est.estimator)
-predictions = spark_est.transform(test_transformed)
+predictions = model.transform(test)
 
-predictions.select("id","prediction").write.parquet(sys.argv[4], mode="overwrite")
+predictions.select("id","prediction").write.parquet(sys.argv[3], mode="overwrite")
 
 
 
