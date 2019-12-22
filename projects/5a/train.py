@@ -29,6 +29,7 @@ from joblib import dump
 from sklearn.linear_model import LogisticRegression
 import pickle
 from pyspark.ml import PipelineModel
+from sklearn_wrapper import SklearnEstimatorModel
 
 path = sys.argv[1]
 train =  spark.read.json(path)
