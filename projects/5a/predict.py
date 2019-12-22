@@ -27,7 +27,7 @@ model = PipelineModel.load(sys.argv[1])
 test_path = sys.argv[3]
 test =  spark.read.json(test_path)
 test_transformed = model.transform(test)
-spark_est = SklearnEstimatorModel(model_path=arg[2])
+spark_est = SklearnEstimatorModel(model_file=arg[2])
 
 predictions = spark_est.transform(test_transformed)
 

@@ -2,12 +2,10 @@
 
 from pyspark.sql.types import *
 from pyspark.ml.feature import *
-import pyspark.sql.functions as f
+import pyspark.sql.functions as F
 from pyspark.ml import Pipeline
 from sklearn-wrapper import 
 
-with open("logistic_model.pk", "wb") as f:
-    pickle.dump(est, f)
     
 stop_words = StopWordsRemover.loadDefaultStopWords("english")
 tokenizer = RegexTokenizer(inputCol="reviewText", outputCol="wordsReview", pattern="\\W")
@@ -22,5 +20,14 @@ pipeline = Pipeline(stages=[
     assembler
 ])
 
+@F.udf(ArrayType(DoubleType()))
+def vectorToArray(row):
+    return row.toArray().tolist()
 
-sklearn_est = SklearnEstimatorModel()
+est_broadcast = spark.sparkContext.broadcast(est)
+@F.pandas_udf(DoubleType())
+def predict(series):
+    predictions = est_broadcast.value.predict(series.tolist())
+    return pd.Series(predictions)
+
+sklearn_est = SklearnEstimatorModel
