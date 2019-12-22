@@ -24,12 +24,10 @@ from pyspark.sql.types import *
 from pyspark.ml.feature import *
 import pyspark.sql.functions as f
 from pyspark.ml import Pipeline
-from model import pipeline, sklearn_est
-from joblib import dump
+from model import pipeline
 from sklearn.linear_model import LogisticRegression
-import pickle
 from pyspark.ml import PipelineModel
-from sklearn_wrapper import SklearnEstimatorModel
+from pyspark.ml.util import DefaultParamsReadable, DefaultParamsWritable<strong></strong>
 
 path = sys.argv[1]
 train =  spark.read.json(path)
@@ -37,11 +35,6 @@ train =  spark.read.json(path)
 pipeline_model = pipeline.fit(train)
 train_transformed = pipeline_model.transform(train)
 pipeline_model.write().overwrite().save(sys.argv[2])
-
-local_dataset = train_transformed.select("features", "label").toPandas()
-est = LogisticRegression(random_state=5757)
-est.fit(local_dataset["features"].tolist(), local_dataset["label"])
-dump(est, sys.argv[3])
 
 #with open("logistic_model.pk", "wb") as f:
 #    pickle.dump(est, f)
