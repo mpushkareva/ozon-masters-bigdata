@@ -13,7 +13,7 @@ from joblib import load, dump
 from pyspark.ml import Estimator
 from pickle import loads, dumps
 import base64
-
+from pyspark.ml.util import DefaultParamsReadable, DefaultParamsWritable
     
 stop_words = StopWordsRemover.loadDefaultStopWords("english")
 tokenizer = RegexTokenizer(inputCol="reviewText", outputCol="wordsReview", pattern="\\W")
@@ -51,7 +51,8 @@ class HasSklearnModel(Params):
 
     def getSklearnModel(self):
         return self.getOrDefault(self.sklearn_model)
- class SklearnEstimatorModel(Model, HasSklearnModel, HasFeaturesCol, HasPredictionCol):
+ class SklearnEstimatorModel(Model, HasSklearnModel, HasFeaturesCol, HasPredictionCol,
+                           DefaultParamsReadable, DefaultParamsWritable):
     #sklearn_model = Param(Params._dummy(), "sklearn_model", "sklearn_model",
      #   typeConverter=TypeConverters.toString)
     
@@ -73,7 +74,8 @@ class HasSklearnModel(Params):
         dataset = dataset.withColumn("features_array", vectorToArray("features")).localCheckpoint()
         return dataset.withColumn("prediction", predict("features_array"))
     
-   class SklearnEstimator(Estimator, HasSklearnModel, HasFeaturesCol, HasPredictionCol, HasLabelCol):
+   class SklearnEstimator(Estimator, HasSklearnModel, HasFeaturesCol, HasPredictionCol, HasLabelCol,
+                           DefaultParamsReadable, DefaultParamsWritable):
     @keyword_only
     def __init__(self, featuresCol="features", predictionCol="prediction", labelCol="label"):
         super(SklearnEstimator, self).__init__()
