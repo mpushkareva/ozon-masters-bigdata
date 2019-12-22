@@ -41,8 +41,7 @@ pipeline_model.write().overwrite().save(sys.argv[2])
 local_dataset = train_transformed.select("features", "label").toPandas()
 est = LogisticRegression(random_state=5757)
 est.fit(local_dataset["features"].tolist(), local_dataset["label"])
-est_broadcast = spark.sparkContext.broadcast(est)
-dump(est, "5.joblib")
+dump(est, sys.argv[3])
 
 #with open("logistic_model.pk", "wb") as f:
 #    pickle.dump(est, f)

@@ -28,7 +28,7 @@ test_path = sys.argv[3]
 test =  spark.read.json(test_path)
 test_transformed = model.transform(test)
 spark_est = SklearnEstimatorModel(model_file=arg[2])
-
+est_broadcast = spark.sparkContext.broadcast(spark_est.estimator)
 predictions = spark_est.transform(test_transformed)
 
 predictions.select("id","prediction").write.parquet(sys.argv[4], mode="overwrite")
