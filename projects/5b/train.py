@@ -27,7 +27,7 @@ from pyspark.ml import Pipeline
 from model import pipeline
 from sklearn.linear_model import LogisticRegression
 from pyspark.ml import PipelineModel
-from pyspark.ml.util import DefaultParamsReadable, DefaultParamsWritable<strong></strong>
+from pyspark.ml.util import DefaultParamsReadable, DefaultParamsWritable
 
 path = sys.argv[1]
 train =  spark.read.json(path)
