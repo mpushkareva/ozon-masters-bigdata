@@ -120,9 +120,10 @@ class SklearnEstimator(Estimator, HasFeaturesCol, HasPredictionCol, HasLabelCol,
          #   pickle.dump(self.est, f)    
         self.est.fit(local_dataset["features_array"].tolist(), local_dataset[self.getLabelCol()])
         model_string = base64.b64encode(dumps(self.est)).decode('utf-8')
-        #self.setSklearnModel(model_string)
-        return SklearnEstimatorModel(sklearn_model=model_string, predictionCol=self.getPredictionCol(),
+        sklearn_est = SklearnEstimatorModel(sklearn_model=model_string, predictionCol=self.getPredictionCol(),
                                          featuresCol=self.getFeaturesCol())
+        sklearn_est.setParams(sklearn_model = model_string)
+        return sklearn_est
 
 
 
