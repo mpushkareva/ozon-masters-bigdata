@@ -1,15 +1,15 @@
 #!/opt/conda/envs/dsenv/bin/python
 
+
 import sys, os
 import logging
 from joblib import load
 import pandas as pd
 
 sys.path.append('.')
-from model import fields
 
 #load the model
-model = load("2.joblib")
+model = load("projects/2/2.joblib")
 
 
 #read and infere
@@ -24,9 +24,9 @@ read_opts=dict(
 )
 
 for df in pd.read_csv(sys.stdin, **read_opts):
-    df_selected = df.loc[:, fields_selected]
+    df_selected = df.iloc[:, :15]
     df_selected = df_selected.replace("\\N", "0")
-    df_selected = pd.to_numeric(df_selected)
+    df_selected.iloc[:, 1:] = df_selected.iloc[:, 1:].apply(pd.to_numeric, errors='coerce')
     #df_selected.iloc[:, 14:17] = df_selected.iloc[:, 14:17].replace("\\N", "")
     pred = model.predict(df_selected)
     out = zip(df_selected.id, pred)

@@ -26,11 +26,11 @@ logging.info("ARGS {}".format(sys.argv[1:]))
 # Read script arguments
 #
 try:
-  proj_id = sys.argv[1] 
-  train_path = sys.argv[2]
+    proj_id = sys.argv[1] 
+    train_path = sys.argv[2]
 except:
-  logging.critical("Need to pass both project_id and train dataset path")
-  sys.exit(1)
+    logging.critical("Need to pass both project_id and train dataset path")
+    sys.exit(1)
 
 
 logging.info(f"TRAIN_ID {proj_id}")
@@ -61,4 +61,4 @@ model_score = log_loss(y_test, predictions)
 logging.info(f"model score: {model_score:.3f}")
 
 # save the model
-dump(model, "{}.joblib".format(proj_id))
+dump(model, "projects/{}.joblib".format(proj_id))
