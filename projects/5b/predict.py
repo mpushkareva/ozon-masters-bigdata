@@ -45,9 +45,8 @@ import model
 from pyspark.ml.util import DefaultParamsReadable, DefaultParamsWritable
 
 model1 = PipelineModel.load(sys.argv[1])
-test = spark.read.load(sys.argv[2], format="json")
-
+test_path = sys.argv[2]
+test = spark.read.json(test_path)
 predictions = model1.transform(test)
 
-predictions.write.format("json").save(sys.argv[3])
-
+predictions.select("id","prediction").write.parquet(sys.argv[3], mode="overwrite")

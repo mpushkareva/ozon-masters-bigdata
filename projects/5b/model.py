@@ -77,8 +77,8 @@ class SklearnEstimatorModel(Model, HasFeaturesCol, HasPredictionCol, HasSklearnM
     @keyword_only
     def __init__(self, sklearn_model=None, featuresCol="features", predictionCol="prediction"):
         super(SklearnEstimatorModel, self).__init__()
-        #if sklearn_model is None:
-        #    raise ValueError("model_file must be specified!")
+        if sklearn_model is None:
+            raise ValueError("model_file must be specified!")
         #with open(model_file, "rb") as f:
         #    self.estimator = load(model_file)
         self.setSklearnModel(sklearn_model)
