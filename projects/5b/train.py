@@ -2,7 +2,7 @@
 
 import os
 import sys
-
+'''
 SPARK_HOME = "/usr/hdp/current/spark2-client"
 PYSPARK_PYTHON = "/opt/conda/envs/dsenv/bin/python"
 os.environ["PYSPARK_PYTHON"]= PYSPARK_PYTHON
@@ -18,17 +18,30 @@ from pyspark import SparkConf
 spark = SparkSession.builder.getOrCreate()
 spark.sparkContext.setLogLevel('WARN')
 conf = SparkConf()
+'''
+from pyspark.sql import SparkSession
 
-from pyspark.sql.types import *
-from pyspark.ml.feature import *
-import pyspark.sql.functions as F
-import pandas as pds
+spark = SparkSession.builder.getOrCreate()
+spark.sparkContext.setLogLevel('WARN')
+
+
 from pyspark import keyword_only
 from pyspark.ml import Model
 from pyspark.ml.param import Param, Params, TypeConverters
 from pyspark.ml.param.shared import HasFeaturesCol, HasLabelCol, HasPredictionCol
-from joblib import load
-from pyspark.ml import Pipeline, PipelineModel
+from pyspark.sql.types import *
+from pyspark.ml.feature import *
+import pyspark.sql.functions as F
+#from pyspark.ml import Estimator
+from sklearn.linear_model import LogisticRegression
+import pandas as pd
+from joblib import load, dump
+from pyspark.ml import Estimator
+from pickle import loads, dumps
+import base64
+from pyspark.ml import Pipeline
+
+from pyspark.ml.util import DefaultParamsReadable, DefaultParamsWritable
 from model import pipeline
 
 df = spark.read.json(sys.argv[1])
