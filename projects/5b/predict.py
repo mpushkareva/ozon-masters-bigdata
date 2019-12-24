@@ -29,12 +29,14 @@ from pyspark import keyword_only
 from pyspark.ml import Model
 from pyspark.ml.param import Param, Params, TypeConverters
 from pyspark.ml.param.shared import HasFeaturesCol, HasLabelCol, HasPredictionCol
-from pyspark.ml import Pipelin
+from pyspark.ml import Pipeline, PipelineModel
+
+from pyspark.ml.util import DefaultParamsReadable, DefaultParamsWritable
 
 model = PipelineModel.load(sys.argv[1])
 test_path = sys.argv[2]
 test =  spark.read.json(test_path)
-predictions = model.transform(test)
+predictions = model._transform(test)
 
 predictions.select("id","prediction").write.parquet(sys.argv[3], mode="overwrite")
 
