@@ -1,35 +1,16 @@
 #!/opt/conda/envs/dsenv/bin/python
-
-import sklearn
-import numpy as np
-import pandas as pd
-import sys
-import json
-import re
-import base64
-import pickle
-
-from sklearn import linear_model
-from sklearn.preprocessing import normalize
-from pyspark import SparkConf
-from pyspark.sql import SparkSession
-from sklearn.feature_extraction.text import CountVectorizer
-from pyspark.ml.feature import *
-from sklearn.linear_model import LogisticRegression
-from sklearn.datasets import make_classification
-from pyspark.ml import Estimator
-from pyspark.ml import Pipeline
-from pyspark.ml.linalg import DenseVector
-from pyspark import keyword_only
-from pyspark.ml import Model
-from pyspark.ml.linalg import VectorUDT
-from pyspark.ml.param import Param, Params, TypeConverters
-from pyspark.ml.param.shared import HasFeaturesCol, HasLabelCol, HasPredictionCol
 from pyspark.sql.types import *
-from pyspark.sql import functions as F
-from pyspark.ml import Pipeline, PipelineModel
-from pyspark.ml.util import DefaultParamsReadable, DefaultParamsWritable
-from joblib import dump
+from pyspark.ml.feature import *
+import pyspark.sql.functions as F
+from pyspark.ml import Pipeline
+from sklearn_wrapper import SklearnEstimatorModel
+
+    
+stop_words = StopWordsRemover.loadDefaultStopWords("english")
+tokenizer = RegexTokenizer(inputCol="reviewText", outputCol="wordsReview", pattern="\\W")
+swr = StopWordsRemover(inputCol=tokenizer.getOutputCol(), outputCol="reviewFiltered", stopWords=stop_words)
+count_vectorizer = CountVectorizer(inputCol=swr.getOutputCol(), outputCol="reviewVector", binary=True, vocabSize=20)
+assembler = VectorAssembler(inputCols=[count_vectorizer.getOutputCol(), 'verified'], outputCol="features")
 
 @F.pandas_udf(DoubleType())
 def predict(series):
@@ -39,9 +20,8 @@ def predict(series):
     return pd.Series(predictions)
 
 @F.udf(ArrayType(DoubleType()))
-def _sparseVectorToArray(row):
+def vectorToArray(row):
     return row.toArray().tolist()
-
 
 class HasSklearnModel(Params):
 
@@ -54,15 +34,9 @@ class HasSklearnModel(Params):
         self._set(**kwargs)
         
     def setSklearnModel(self, value):
-        """
-        Sets the value of :py:attr:`outputCol`.
-        """
         return self._set(sklearn_model=value)
 
     def getSklearnModel(self):
-        """
-        Gets the value of outputCol or its default value.
-        """
         return self.getOrDefault(self.sklearn_model)
     
 class SklearnEstimatorModel(Model, HasFeaturesCol, HasLabelCol, HasPredictionCol, HasSklearnModel,
@@ -83,21 +57,15 @@ class SklearnEstimatorModel(Model, HasFeaturesCol, HasLabelCol, HasPredictionCol
     def setParams(self, sklearn_model=None, featuresCol="features", labelCol="label", 
                  predictionCol="prediction"):
         self.setSklearnModel(sklearn_model)
+        self.est = loads(base64.b64decode(self.getSklearnModel().encode('utf-8')))
         kwargs = self._input_kwargs
         return self._set(**kwargs)
-
-    def setValue(self, value):
-        return self._set(value=value)
-
-    def getValue(self):
-        return self.getOrDefault(self.value)
         
     def _transform(self, dataset):
-        self.estimator = pickle.loads(base64.b64decode(self.getSklearnModel().encode('utf-8')))
-        global est_broadcast
-        est_broadcast = spark.sparkContext.broadcast(self.estimator)
-        local_dataset = dataset.withColumn(self.getFeaturesCol(), _sparseVectorToArray("word_vector")).localCheckpoint()
-        return local_dataset.withColumn(self.getPredictionCol(), predict(self.getFeaturesCol()))
+        global est_broadcast 
+        est_broadcast = spark.sparkContext.broadcast(self.est)
+        dataset = dataset.withColumn("features_array", vectorToArray("features")).localCheckpoint()
+        return dataset.withColumn("prediction", predict("features_array"))
 
 class SklearnEstimator(Estimator, HasFeaturesCol, HasPredictionCol, HasLabelCol, HasSklearnModel):
     @keyword_only
@@ -107,24 +75,26 @@ class SklearnEstimator(Estimator, HasFeaturesCol, HasPredictionCol, HasLabelCol,
         self._set(**kwargs)
         
     def _fit(self, dataset):
-        local_dataset = dataset.withColumn(self.getFeaturesCol(), _sparseVectorToArray("word_vector")).localCheckpoint()
-        local_dataset = local_dataset.select(self.getFeaturesCol(), self.getLabelCol()).toPandas()
+        local_dataset = dataset.withColumn("features_array", vectorToArray("features")).localCheckpoint()
+        local_dataset = dataset.select("features_array", self.getLabelCol()).toPandas()
         self.est = LogisticRegression()
-        self.est.fit(local_dataset[self.getFeaturesCol()].tolist(), local_dataset[self.getLabelCol()])
-        self.sklearn_model = base64.b64encode(pickle.dumps(self.est)).decode('utf-8')
-        #self.setSklearnModel(base64.b64encode(pickle.dumps(self.est)).decode('utf-8'))
-        #print(pickle.loads(base64.b64decode(self.getSklearnModel().encode('utf-8'))))
-        return SklearnEstimatorModel(sklearn_model=self.sklearn_model, predictionCol=self.getPredictionCol(),
-                                         featuresCol=self.getFeaturesCol(), labelCol=self.getLabelCol())
+        #with open(self.model_file, "wb") as f:
+         #   pickle.dump(self.est, f)    
+        self.est.fit(local_dataset["features_array"].tolist(), local_dataset[self.getLabelCol()])
+        model_string = base64.b64encode(dumps(self.est)).decode('utf-8')
+        self.setSklearnModel(model_string)
+        return SklearnEstimatorModel(sklearn_model=model_string, predictionCol=self.getPredictionCol(),
+                                         featuresCol="features_array")
 
-tokenizer = Tokenizer(inputCol="reviewText", outputCol="words")
-hasher = HashingTF(numFeatures=10, binary=True, inputCol=tokenizer.getOutputCol(), outputCol="word_vector")
+
 
 spark_est = SklearnEstimator()
 
 pipeline = Pipeline(stages=[
-    tokenizer,
-    hasher,
+    tokenizer,   
+    swr,    
+    count_vectorizer,
+    assembler,
     spark_est
 ])
 
