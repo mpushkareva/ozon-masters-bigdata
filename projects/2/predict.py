@@ -9,7 +9,7 @@ import pandas as pd
 sys.path.append('.')
 
 #load the model
-model = load("projects/2/2.joblib")
+model = load("2.joblib")
 
 
 #read and infere
