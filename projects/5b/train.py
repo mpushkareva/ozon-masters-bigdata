@@ -19,38 +19,19 @@ spark = SparkSession.builder.getOrCreate()
 spark.sparkContext.setLogLevel('WARN')
 conf = SparkConf()
 
-import sklearn
-import numpy as np
-import pandas as pd
-import sys
-import json
-import re
-import base64
-import pickle
-
-from sklearn import linear_model
-from sklearn.preprocessing import normalize
-from pyspark import SparkConf
-from pyspark.sql import SparkSession
-from sklearn.feature_extraction.text import CountVectorizer
+from pyspark.sql.types import *
 from pyspark.ml.feature import *
-from sklearn.linear_model import LogisticRegression
-from sklearn.datasets import make_classification
-from pyspark.ml import Estimator
-from pyspark.ml import Pipeline
-from pyspark.ml.linalg import DenseVector
+import pyspark.sql.functions as F
+import pandas as pds
 from pyspark import keyword_only
 from pyspark.ml import Model
-from pyspark.ml.linalg import VectorUDT
 from pyspark.ml.param import Param, Params, TypeConverters
-from pyspark.ml.util import DefaultParamsReadable, DefaultParamsWritable
 from pyspark.ml.param.shared import HasFeaturesCol, HasLabelCol, HasPredictionCol
-from pyspark.sql.types import *
-from pyspark.sql import functions as F
+from joblib import load
 from pyspark.ml import Pipeline, PipelineModel
 from model import pipeline
 
-df = spark.read.load(sys.argv[1], format="json")
+df = spark.read.json(sys.argv[1])
 
 pipeline_model = pipeline.fit(df)
 
