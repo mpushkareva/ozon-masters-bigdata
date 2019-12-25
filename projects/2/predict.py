@@ -17,7 +17,7 @@ numeric_features = ["if"+str(i) for i in range(1,14)]
 categorical_features = ["cf"+str(i) for i in range(1,27)] + ["day_number"]
 
 fields_without_label = ["id"] + numeric_features + categorical_features
-fields_selected = ["id"] + ["if"+str(i) for i in range(1,14)] 
+fields_selected = ["if"+str(i) for i in range(1,14)] 
 read_opts=dict(
         sep='\t', names=fields_without_label, index_col=False, header=None,
         iterator=True, chunksize=1000
@@ -29,5 +29,5 @@ for df in pd.read_csv(sys.stdin, **read_opts):
     df_selected = df_selected.apply(pd.to_numeric)
     #df_selected.iloc[:, 14:17] = df_selected.iloc[:, 14:17].replace("\\N", "")
     pred = model.predict(df_selected)
-    out = zip(df_selected.id, pred)
+    out = zip(df.id, pred)
     print("\n".join(["{0}\t{1}".format(*i) for i in out]))
