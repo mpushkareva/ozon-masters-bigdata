@@ -44,11 +44,11 @@ logging.info(f"TRAIN_PATH {train_path}")
 read_table_opts = dict(sep="\s", names=fields, index_col=False)
 df = pd.read_table(train_path, **read_table_opts)
 
-fields_selected = ["id"] + ["if"+str(i) for i in range(1,14)] 
+fields_selected = ["if"+str(i) for i in range(1,14)] 
 
 #split train/test
 X_train, X_test, y_train, y_test = train_test_split(
-    df.loc[:, fields_selected], df.iloc[:,1], test_size=0.33, random_state=42
+    df.loc[:, fields_selected], df.loc[:, "label"], test_size=0.33, random_state=42
 )
 #df.iloc[:,:-1], df.iloc[:,-1], test_size=0.33, random_state=42
 #
