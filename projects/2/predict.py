@@ -24,7 +24,7 @@ read_opts=dict(
 )
 
 for df in pd.read_csv(sys.stdin, **read_opts):
-    df_selected = df.iloc[:, :15]
+    df_selected = df.iloc[:, :14]
     df_selected = df_selected.replace("\\N", "0")
     df_selected.iloc[:, 1:] = df_selected.iloc[:, 1:].apply(pd.to_numeric)
     #df_selected.iloc[:, 14:17] = df_selected.iloc[:, 14:17].replace("\\N", "")
